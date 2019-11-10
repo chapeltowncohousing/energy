@@ -1,0 +1,47 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# Chaco Energy Survey results
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE
+)
+library(tidyverse)
+d = read_csv("~/Dropbox/Chapeltown Cohousing/Energy/energySurvey/energy-survey-clean.csv")
+d$total = rowSums(d %>% select(matches("living")), na.rm = TRUE )
+```
+
+
+```{r cars}
+n_adult = sum(d$current_number_of_adults_living_in_your_house, na.rm = T)
+n_child = sum(d$current_number_of_children_people_aged_under_16_living_in_your_house, na.rm = T)
+```
+
+This document provides a picture of Chaco's energy use, based on responses from `r nrow(d)` households, representing `r n_adult` adults and `r n_child` children. The number of households by occupancy is shown below.
+
+```{r}
+d = d %>% 
+  mutate(`Number of inhabitants` = case_when(
+    total >= 5 ~ "5+", TRUE ~ as.character(total) ))
+d %>% count(`Number of inhabitants`, name = "Number of households") %>% 
+  knitr::kable()
+```
+
+## Transport
+
+```{r}
+n_cycles = sum(d$how_many_bikes_or_other_pedal_cycles_does_you_household_own)
+n_cars = sum(d$how_many_cars_does_you_household_own)
+n_cars_after = sum(d$how_many_cars_does_your_household_plan_to_own_when_you_are_living_at_cha_co, na.rm = TRUE)
+other = d$do_you_have_any_other_kind_of_transport_vehicles_that_you_plan_to_bring_to_chaco_e_g_mobility_scooter_electric_bike_bike_trailer
+# d %>% count(how_many_bikes_or_other_pedal_cycles_does_you_household_own)
+```
+
+Before moving in, Chaco residents owned a total of `r n_cycles` bicycles and `r n_cars` cars.
+When living in Chaco, residents plan to own a total of `r n_cars_after` cars.
